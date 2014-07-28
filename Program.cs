@@ -5,9 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace Acervuline {
     class Program {
@@ -17,11 +15,47 @@ namespace Acervuline {
         static Dictionary<string, dynamic> unitData, summerData;
         static Dictionary<string, dynamic> scrapeData = new Dictionary<string, dynamic>();
 
-		static string RootFolder = ".\\Saved Pages";
-		static string CurrentFolderPath;
+		public static string RootFolder = ".\\Saved Pages";
+		public static string CurrentFolderPath;
 
-        static void Main(string[] args) {
+		static void Main(string[] args) {
 
+			int choice;
+			bool valid = false;
+
+			do {
+
+				PrintMenuBanner(
+					new List<string>(){
+						"Acervuline v24.07.2014",
+						"",
+						"Select an option"
+					},
+					ConsoleColor.White
+				);
+
+				Console.WriteLine("1) Rebuild Data From Web");
+				Console.WriteLine("2) Rebuild Data From Local");
+
+				if(Int32.TryParse(Console.ReadLine(), out choice)) {
+
+					switch(choice) {
+						case 1:
+							loadStreamFromWeb("blank");
+							break;
+						case 2:
+							loadStreamFromLocal(RootFolder);
+							break;
+					}
+
+				}
+
+			} while(!valid);
+
+			return;
+
+			#region Old Code
+			/*
 			// Disipline list to loop over 
             HtmlDocument webDoc = GetWebStream("https://www.qut.edu.au/study/unit-search");
 
@@ -56,9 +90,137 @@ namespace Acervuline {
             }
 
             Console.ReadKey();
+			*/
+			#endregion
 
-        } // End Main
+		} // End Main
 
+		public static void loadStreamFromWeb(string url) {
+			Console.WriteLine("Load from web NYI");
+		}
+
+		public static void loadStreamFromLocal(string filepath) {
+
+			new LocalDocHandler(filepath);
+
+		}
+
+		#region Console Banner Code
+		/// <summary>
+		/// 
+		/// Prints a console banner, given a list of strings,
+		/// expands to the max width of the default windows console (not powershell).
+		/// 
+		/// <para>
+		///     List Strings greater than 78 will not wrap neatly. So manually break them if needed.
+		/// </para>
+		/// 
+		/// <conditions>
+		///     <para>Conditions</para>
+		///     <para>
+		///         Pre: Given a List of strings, optionally ConsoleColor type for foreground
+		///         and a width for the banner.
+		///     </para>
+		///     <para>
+		///         Post: Outputs a distinct 'banner' of the given strings in the colour you chose.
+		///     </para>
+		/// </conditions>
+		///
+		/// <author>
+		///     <para>
+		///         Author: Scott J. Schultz
+		///     </para>
+		///     <para>
+		///         Date: April 2014
+		///     </para>
+		/// </author>
+		/// 
+		/// </summary>
+		/// 
+		/// <parameters>
+		///     <param name="menuLines">
+		///         A List of items. Each entry is its own line within the banner.
+		///         Does not break lines to wrap.
+		///     </param>
+		///     <param name="foregroundColour">
+		///         Foreground colour. Must be set, has no default.
+		///     </param>
+		///     <param name="bannerWidth">
+		///         [Optional] Defines the width of the banner. Defaults to 80, best results with 80.
+		///     </param>
+		/// </parameters>
+		public static void PrintMenuBanner(List<string> menuLines,
+										   ConsoleColor foregroundColour,
+										   int bannerWidth = 80) {
+
+			// Border offset accounts for the +'s and |'s used for corners and borders respectively.
+			const int BORDER_OFFSET = 2,
+					  ODD_NUMBER_OFFSET = 1;
+			// So realistically there's only bannerwidth - offset available space for characters
+			int offsetBannerWidth = bannerWidth - BORDER_OFFSET,
+				stringLength,
+				paddingLength,
+				paddingLeft,
+				difference;
+
+			string consoleLine;
+
+			// --- End variable declarations --- //
+
+			Console.ForegroundColor = foregroundColour;
+
+			// Pad our borders and whitespace lines based on our adjusted offsets
+			Console.Write("\n+{0}+", "".PadLeft(offsetBannerWidth, '-'));
+			Console.Write("|{0}|", "".PadLeft(offsetBannerWidth, ' '));
+
+			// Loop through each menu line
+			foreach(var itemString in menuLines) {
+
+				stringLength = itemString.Length;
+				// Figure out how much whitespace we'll need to pad between the borders
+				// To center each string within the window.
+				// paddingLeft will always be the largest value
+
+				paddingLength = (offsetBannerWidth - stringLength) / 2;
+				paddingLeft = paddingLength; // Applied only to the right hand side of strings
+
+				// Do an odd number check. Odd number strings cut the length short
+				// due to lazy rounding methods above. Odd number length strings will always be one off
+				// the length of the bannerWidth, if left at 80
+				if((stringLength + paddingLength) != offsetBannerWidth) {
+					paddingLeft += ODD_NUMBER_OFFSET;
+				} // End if
+
+				// Check that the length hasn't exceeded the max offset width after adjustments.
+				// If it has, subtract the difference from paddingLength
+				if((stringLength + paddingLength + paddingLeft) > offsetBannerWidth) {
+					difference = (stringLength + paddingLength + paddingLeft) - offsetBannerWidth;
+					paddingLength -= difference;
+				} // End if
+
+				consoleLine = String.Format(
+					"|{0}{1}{2}|",
+					"".PadLeft(paddingLeft, ' '),
+					itemString,
+					"".PadRight(paddingLength, ' ')
+				);
+				Console.Write(consoleLine);
+
+			} // End foreach(item in menuLines)
+
+			// Close our banner off and reset the console text colour to the defined default
+			// (Not the OS default)
+			Console.Write("|{0}|", "".PadLeft(offsetBannerWidth, ' '));
+			Console.Write("+{0}+\n", "".PadLeft(offsetBannerWidth, '-'));
+			Console.ForegroundColor = ConsoleColor.White;
+
+		} // End PrintMenuBanner
+		#endregion
+
+
+		// Probably dead code below
+		#region Old Code
+		/*
 		/// <summary>
 		///		Load the given url from a string.
 		///		
@@ -144,7 +306,7 @@ namespace Acervuline {
 
         /// <summary>
         ///     Placeholder function, not quite sure if there are variants
-        ///     outside of Unit Outline: Semester 1/2 YYYY
+        ///     outside of, Unit Outline: Semester 1/2 YYYY
         /// </summary>
         /// <param name="preformattedString"></param>
         /// <returns></returns>
@@ -241,47 +403,6 @@ namespace Acervuline {
 
         }
 
-        /*
-            Loading Unit Page: https://www.qut.edu.au/study/unit-search/unit?unitCode=AYB114
-            &idunit=48502
-            unitCode
-            INN342
-            prereqs
-             INN210 or INN340 or INN122&nbsp;
-            antireqs
-             ITB239, INB342 &nbsp;
-            equivs
-             ITN239&nbsp;
-            assumed
-            Knowledge of IT concepts at the introductory level: Web browsing; Elementary Sta
-            tistics; Basic Database Concepts; Finding library resources; and Issues involved
-             in aligning business technology and information systems is assumed knowledge.&n
-            bsp;
-            CP
-            12
-            timetable
-
-                      <a target="_blank" href="https://qutvirtual3.qut.edu.au/qvpublic/ttab_
-            unit_search_p.process_teach_period_search?p_unit_cd=INN342">Details in QUT Virtu
-            al</a>, if available
-            avail
-
-
-                        <dl>
-                          <dt>
-                            <strong>Gardens Point</strong>
-                          </dt>
-                          <dd>SEM-2</dd>
-                        </dl>
-
-
-            CSP
-            $1,076
-            DOM
-            $2,124
-            INT
-            $3,048
-        */
         public static string ParseTableHeader(string headerName) {
 
             string category = "";
@@ -436,12 +557,13 @@ namespace Acervuline {
 
             return availDict;
 
-        }
+		}
+		*/
+		#endregion
 
+	} // End Class
 
-
-    }
-}
+} // End Namespace
 
 
 
