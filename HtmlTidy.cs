@@ -94,7 +94,8 @@ namespace Acervuline {
 		private static void GeneralPass() {
 
 			// Remove div tags
-			htmlFragment = Regex.Replace(htmlFragment, @"<div>|<\/div>", "");
+			htmlFragment = Regex.Replace(htmlFragment, @"<\/?(?:div|p)>", "");
+			htmlFragment = htmlFragment.Trim();
 
 			// convert breaks to newline chars
 			htmlFragment = Regex.Replace(htmlFragment, @"(<br\s*\/?>\s*)+", "\n");
@@ -122,7 +123,9 @@ namespace Acervuline {
 			// Then wrap text that isn't contained within a tag in p tags
 			htmlFragment = Regex.Replace(htmlFragment, @"^(?!<)(.*?)$", "<p>$1</p>", RegexOptions.Multiline);
 
-			htmlFragment = Regex.Replace(htmlFragment, @"\n<p><\/p>", "");
+			htmlFragment = Regex.Replace(htmlFragment, @"\n?<p>\s?<\/p>", "");
+
+			htmlFragment = htmlFragment.Trim();
 
 		}
 

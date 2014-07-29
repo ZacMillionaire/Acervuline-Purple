@@ -98,7 +98,7 @@ namespace Acervuline {
 
 				//Console.WriteLine(sectionNode.InnerHtml.Trim());
 
-				sectionDetails.Add(sectionNode.InnerHtml.Trim());
+				sectionDetails.Add(sectionNode.OuterHtml.Trim());
 
 			}
 
