@@ -69,8 +69,8 @@ namespace Acervuline {
 				string rowHeader;
 				dynamic rowBody;
 
-				rowHeader = Program.ParseTableHeader(tableData.ChildNodes[1].InnerHtml);
-				rowBody = Program.ParseTableBody(tableData.ChildNodes[3].InnerHtml, rowHeader);
+				rowHeader = HtmlDocumentHandler.ParseTableHeader(tableData.ChildNodes[1].InnerHtml);
+				rowBody = HtmlDocumentHandler.ParseTableBody(tableData.ChildNodes[3].InnerHtml, rowHeader);
 
 				headerDict.Add(rowHeader, rowBody);
 
@@ -79,7 +79,6 @@ namespace Acervuline {
 			return headerDict;
 
 		}
-
 
 		private static string FormatSectionData(string sectionTitle, HtmlNodeCollection sectionContent) {
 

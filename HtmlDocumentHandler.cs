@@ -56,7 +56,10 @@ namespace Acervuline {
 				if(!summerOffer) {
 					ParseTableRow(tableData);
 				} else {
-					summerData.Add("summerDetails", ParseSummerData(tableData));
+
+					Dictionary<string, dynamic> parsedData = ParseSummerData(tableData);
+
+					summerData.Add(parsedData.Keys.ElementAt(0), parsedData.Values.ElementAt(0));
 				}
 
 			}
@@ -117,16 +120,16 @@ namespace Acervuline {
 
 		private static Dictionary<string, dynamic> ParseSummerData(HtmlNode summerRow) {
 
-			Dictionary<string, dynamic> summerData = new Dictionary<string, dynamic>();
+			Dictionary<string, dynamic> parsedSummerData = new Dictionary<string, dynamic>();
 			string rowHeader;
 			dynamic rowBody;
 
 			rowHeader = ParseTableHeader(summerRow.ChildNodes[1].InnerHtml);
 			rowBody = ParseTableBody(summerRow.ChildNodes[3].InnerHtml, rowHeader);
 
-			summerData.Add(rowHeader, rowBody);
+			parsedSummerData.Add(rowHeader, rowBody);
 
-			return summerData;
+			return parsedSummerData;
 
 		}
 

@@ -54,10 +54,10 @@ namespace Acervuline {
 				string rowHeader;
 				dynamic rowBody;
 
-				rowHeader = Program.ParseTableHeader(tableData.ChildNodes[1].InnerHtml);
-				rowBody = Program.ParseTableBody(tableData.ChildNodes[3].InnerHtml, rowHeader);
+				//rowHeader = Program.ParseTableHeader(tableData.ChildNodes[1].InnerHtml);
+				//rowBody = Program.ParseTableBody(tableData.ChildNodes[3].InnerHtml, rowHeader);
 
-				headerDict.Add(rowHeader, rowBody);
+				//headerDict.Add(rowHeader, rowBody);
 
 			}
 

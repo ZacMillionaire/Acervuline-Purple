@@ -220,7 +220,6 @@ namespace Acervuline {
 
 		// Probably dead code below
 		#region Old Code
-		/*
 		/// <summary>
 		///		Load the given url from a string.
 		///		
@@ -264,7 +263,7 @@ namespace Acervuline {
 
         } // End GetWebStream
 
-
+		/*
 		/// <summary>
 		///		Loads a unit page, given the raw html element from the disipline list
 		/// </summary>
@@ -303,7 +302,7 @@ namespace Acervuline {
 
 
         } // End LoadUnitPage
-
+		*/
         /// <summary>
         ///     Placeholder function, not quite sure if there are variants
         ///     outside of, Unit Outline: Semester 1/2 YYYY
@@ -315,7 +314,7 @@ namespace Acervuline {
             return preformattedString;
 
         }
-
+		/*
         private static void GetUnitDetails(string url, string unitCode) {
 
             bool summerOffer = false;
@@ -377,8 +376,8 @@ namespace Acervuline {
 			//webDoc.Save();
 
         } // End GetUnitDetails
-
-
+		*/
+		/*
         private static void ParseTableRow(HtmlNode tableRow) {
 
             string rowHeader;
@@ -402,132 +401,7 @@ namespace Acervuline {
             summerData.Add(rowHeader, rowBody);
 
         }
-
-        public static string ParseTableHeader(string headerName) {
-
-            string category = "";
-
-            int firstIndex = headerName.IndexOf('<');
-
-            if(firstIndex > 0) {
-                category = headerName.Remove(firstIndex).Trim();
-            } else {
-                category = headerName;
-            }
-
-            switch(category) {
-                case "QUT code:":
-                case "QUT code":
-                    category = "unitCode";
-                    break;
-                case "Prerequisite(s):":
-                case "Prerequisite(s)":
-                    category = "prereqs";
-                    break;
-                case "Antirequisite(s)":
-                    category = "antireqs";
-                    break;
-                case "Equivalent(s):":
-                case "Equivalent(s)":
-                    category = "equivs";
-                    break;
-                case "Assumed knowledge":
-                    category = "assumed";
-                    break;
-                case "Credit points:":
-                case "Credit points":
-                    category = "CP";
-                    break;
-                case "Timetable":
-                    category = "timetable";
-                    break;
-                case "Availabilities":
-                    category = "avail";
-                    break;
-                case "CSP student contribution":
-                    category = "CSP";
-                    break;
-                case "Domestic tuition unit fee":
-                    category = "DOM";
-                    break;
-                case "International unit fee":
-                    category = "INT";
-                    break;
-                case "Dates":
-                    category = "dates";
-                    break;
-                case "Fee Type":
-                    category = "feeType";
-                    break;
-                case "Domestic unit fee": // Used for summer courses
-                    category = "DOM";
-                    break;
-                case "Fee Rates":
-                    category = "feeRate";
-                    break;
-                case "Restrictions":
-                    category = "restrictions";
-                    break;
-                case "Notes":
-                    category = "note";
-                    break;
-                case "Coordinator:":
-                    category = "coordinator";
-                    break;
-                case "Phone:":
-                    category = "phone";
-                    break;
-                case "Fax:":
-                    category = "fax";
-                    break;
-                case "Email:":
-                    category = "email";
-                    break;
-            }
-
-            return category;
-
-        }
-
-
-        public static dynamic ParseTableBody(string bodyContent, string category) {
-
-            bodyContent = bodyContent.Replace("&nbsp;", "");
-
-            if(category == "prereqs" || category == "antireqs" || category == "equivs") {
-
-                Regex multiUnitRegex = new Regex(@"([A-Z]{3,}[0-9]{3,})");
-                MatchCollection matches = multiUnitRegex.Matches(bodyContent);
-
-                String[] units = new String[matches.Count];
-
-                for(int i = 0; i < matches.Count; i++) {
-                    units[i] = matches[i].Value;
-                }
-
-                return units;
-
-            } else if(category == "timetable") {
-
-                string regex = @"href=\""(.*)\"".*>";
-
-                Regex linkRegex = new Regex(regex);
-                Match match = linkRegex.Match(bodyContent);
-
-                String timeTableURL = match.Groups[1].Value;
-
-                return timeTableURL;
-
-            } else if(category == "avail") {
-
-                return ParseAvailabilities(bodyContent);
-
-            }
-
-            return bodyContent.Trim();
-
-        }
-
+		*/
         private static Dictionary<string, List<string>> ParseAvailabilities(string availabilityData) {
             
             Dictionary<string, List<string>> availDict = new Dictionary<string, List<string>>();
@@ -558,7 +432,6 @@ namespace Acervuline {
             return availDict;
 
 		}
-		*/
 		#endregion
 
 	} // End Class
