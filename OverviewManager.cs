@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 namespace Acervuline {
     class OverviewManager {
 
+		// legacy shit that I can't remember if I still need
+
+		/*
 		public static void ParseUnitOutline(HtmlDocument overviewData) {
 
 
@@ -90,6 +93,7 @@ namespace Acervuline {
 
 		}
 
+		 * */
 
     }
 }

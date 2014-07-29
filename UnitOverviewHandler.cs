@@ -17,6 +17,9 @@ namespace Acervuline {
 			outlineDict = new Dictionary<string, dynamic>();
 			workingFile = LocalDocHandler.LoadFileForReading(Program.CurrentFolderPath + outlineFile);
 
+			string padder = ">".PadLeft(Program.CurrentFolderPath.Length, '-');
+			Console.WriteLine(padder + outlineFile);
+
 			ParseOverview();
 
 			return outlineDict;
@@ -94,13 +97,13 @@ namespace Acervuline {
 				}
 
 				//Console.WriteLine(sectionNode.InnerHtml.Trim());
-				string innerHtml = HtmlTidy.FormatHtml(sectionTitle, sectionNode.InnerHtml.Trim());
 
-				sectionDetails.Add(innerHtml);
+				sectionDetails.Add(sectionNode.InnerHtml.Trim());
 
 			}
 
 			details = string.Join("", sectionDetails.ToArray());
+			string innerHtml = HtmlTidy.FormatHtml(sectionTitle, details.Trim());
 
 			return details;
 

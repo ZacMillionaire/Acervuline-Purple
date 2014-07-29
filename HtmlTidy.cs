@@ -42,6 +42,8 @@ namespace Acervuline {
 
 	}
 
+	// AS LONG AS IT WORKS IT CAN LOOK AS TERRIBLE AS IT WANTS
+	// IT WON'T BE THE BEST, BUT IT CAN CERTAINLY BE THE WORST
 	class HtmlTidy {
 
 		static string htmlFragment, fragmentTitle;
@@ -53,7 +55,6 @@ namespace Acervuline {
 
 			GeneralPass();
 			NormalizeLists();
-			FinalPass();
 
 			switch(fragmentTitle) {
 
@@ -68,6 +69,10 @@ namespace Acervuline {
 				case "approachesToTeachingAndLearning":
 					break;
 				case "assessment":
+
+					// add in missing header for Assessment Submission and Extensions
+					// It's not passed through for some reason
+					AssessmentPass();
 					break;
 				case "academicIntegrity":
 					break;
@@ -79,6 +84,8 @@ namespace Acervuline {
 					throw new NotImplementedException();
 
 			}
+
+			FinalPass();
 
 			return htmlFragment;
 
@@ -99,13 +106,43 @@ namespace Acervuline {
 			// Tidy any errant double dashed lists.
 			htmlFragment = Regex.Replace(htmlFragment, @"-\s-{1,}", "-");
 
+			// Normalize whitespace
+			htmlFragment = Regex.Replace(htmlFragment, @"\s{2,}", " ");
+
 		}
 
 		private static void FinalPass() {
 
+			htmlFragment = htmlFragment.Trim();
+
+			htmlFragment = Regex.Replace(htmlFragment, @"(?<!\w)(<\/\w+>)(?!$)", "\n$1\n", RegexOptions.Multiline);
+
+			htmlFragment = Regex.Replace(htmlFragment, "<h3>", "\n<h3>", RegexOptions.Multiline);
+
 			// Then wrap text that isn't contained within a tag in p tags
 			htmlFragment = Regex.Replace(htmlFragment, @"^(?!<)(.*?)$", "<p>$1</p>", RegexOptions.Multiline);
 
+			htmlFragment = Regex.Replace(htmlFragment, @"\n<p><\/p>", "");
+
+		}
+
+		private static void AssessmentPass() {
+
+			htmlFragment = Regex.Replace(htmlFragment, @"<\/h3>\s?(.*?)\s?(?=$|<h3>)", "</h3>\n$1\n", RegexOptions.Multiline);
+			htmlFragment = Regex.Replace(htmlFragment, @"<h3>(.*?):<\/h3>", "<h3>$1</h3>", RegexOptions.Multiline);
+
+			//htmlFragment = Regex.Replace(htmlFragment, "(</h3>\n)^(.*?)$", "$1<p>$2</p>", RegexOptions.Multiline);
+
+			/*
+			MatchCollection taglessText = Regex.Matches(htmlFragment, @"<\/h3>\s?(.*?)\s?(?=$|<h3>)", RegexOptions.Multiline);
+
+			foreach(Match textBlock in taglessText) {
+
+				string textItem = textBlock.Groups[1].ToString();
+
+				htmlFragment = htmlFragment.Replace(textItem, "<p>" + textItem + "</p>");
+			}
+			*/
 		}
 
 		/// <summary>
@@ -115,7 +152,7 @@ namespace Acervuline {
 		/// </summary>
 		private static void NormalizeLists() {
 
-			string dashedList = @"^-\s?(.*?)\n",
+			string dashedList = @"^-\s?(.*?)(?:\n|$)",
 				   asteriskList = @"\*\s(.*?)<",
 				   singleDigitList = @"\d\.\s(.*?)\n",
 				   doubleDigitList = @"(\d\.\d\s.*?)\n";
@@ -140,7 +177,7 @@ namespace Acervuline {
 
 				FormatAsList(listItems, new string[] { "<ol>", "</ol>" });
 
-			} 
+			}
 			
 			// figure out if this is worth doing later
 			/*
@@ -160,7 +197,7 @@ namespace Acervuline {
 		/// <param name="listItems"></param>
 		private static void FormatAsList(MatchCollection listItems, string[] listTags) {
 
-			string openingTag = listTags[0] + "\n", closingTag = listTags[1] + "\n";
+			string openingTag = "\n" + listTags[0] + "\n", closingTag = listTags[1] + "\n";
 
 			int startIndex = listItems[0].Index;
 			int runningLength = openingTag.Length; // The opening tag is 4 characters + new line, as below
