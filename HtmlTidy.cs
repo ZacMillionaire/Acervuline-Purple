@@ -93,6 +93,25 @@ namespace Acervuline {
 
 		private static void GeneralPass() {
 
+			Dictionary<string, string> searchList = new Dictionary<string, string>() {
+				{ @"<\/?(?:div|p)>", "" },
+				{ @"(<br\s*\/?>\s*)+", "\n" },
+				{ @"<(\/?)(?:b|strong)>", "<$1h3>" },
+				{ @"-\s-{1,}", "-" },
+				{ @"\s{2,}", " "}
+			};
+
+			htmlFragment = htmlFragment.Trim();
+
+			foreach(var entry in searchList) {
+				htmlFragment = Regex.Replace(htmlFragment, entry.Key, entry.Value, RegexOptions.Multiline);
+			}
+
+			htmlFragment = htmlFragment.Trim();
+
+			// legacy code
+
+			/*
 			// Remove div tags
 			htmlFragment = Regex.Replace(htmlFragment, @"<\/?(?:div|p)>", "");
 			htmlFragment = htmlFragment.Trim();
@@ -109,13 +128,29 @@ namespace Acervuline {
 
 			// Normalize whitespace
 			htmlFragment = Regex.Replace(htmlFragment, @"\s{2,}", " ");
-
+			*/
 		}
 
 		private static void FinalPass() {
 
+			Dictionary<string, string> searchList = new Dictionary<string, string>() {
+				{ @"(?<!\w)(<\/\w+>)(?!$)", "\n$1\n" },
+				{ "<h3>", "\n<h3>" },
+				{ @"^(?!<)(.*?)$", "<p>$1</p>" },
+				{ @"\n?<p>\s?<\/p>", "" }
+			};
+
 			htmlFragment = htmlFragment.Trim();
 
+			foreach(var entry in searchList){
+				htmlFragment = Regex.Replace(htmlFragment, entry.Key, entry.Value, RegexOptions.Multiline);
+			}
+
+			htmlFragment = htmlFragment.Trim();
+
+			// legacy code
+			
+			/*
 			htmlFragment = Regex.Replace(htmlFragment, @"(?<!\w)(<\/\w+>)(?!$)", "\n$1\n", RegexOptions.Multiline);
 
 			htmlFragment = Regex.Replace(htmlFragment, "<h3>", "\n<h3>", RegexOptions.Multiline);
@@ -124,8 +159,7 @@ namespace Acervuline {
 			htmlFragment = Regex.Replace(htmlFragment, @"^(?!<)(.*?)$", "<p>$1</p>", RegexOptions.Multiline);
 
 			htmlFragment = Regex.Replace(htmlFragment, @"\n?<p>\s?<\/p>", "");
-
-			htmlFragment = htmlFragment.Trim();
+			*/
 
 		}
 
