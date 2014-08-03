@@ -51,12 +51,11 @@ namespace Acervuline {
 		public static string FormatHtml(string title, string html) {
 
 			htmlFragment = html;
-			fragmentTitle = title.ToCamelCase();
 
 			GeneralPass();
 			NormalizeLists();
 
-			switch(fragmentTitle) {
+			switch(title) {
 
 				case "rationale":
 					break;
@@ -69,9 +68,6 @@ namespace Acervuline {
 				case "approachesToTeachingAndLearning":
 					break;
 				case "assessment":
-
-					// add in missing header for Assessment Submission and Extensions
-					// It's not passed through for some reason
 					AssessmentPass();
 					break;
 				case "academicIntegrity":
@@ -109,26 +105,6 @@ namespace Acervuline {
 
 			htmlFragment = htmlFragment.Trim();
 
-			// legacy code
-
-			/*
-			// Remove div tags
-			htmlFragment = Regex.Replace(htmlFragment, @"<\/?(?:div|p)>", "");
-			htmlFragment = htmlFragment.Trim();
-
-			// convert breaks to newline chars
-			htmlFragment = Regex.Replace(htmlFragment, @"(<br\s*\/?>\s*)+", "\n");
-
-			// Convert strong and b tags to h3 tags. Both are used as header elements in outlines,
-			// and not for inline styling
-			htmlFragment = Regex.Replace(htmlFragment, @"<(\/?)(?:b|strong)>", "<$1h3>");
-
-			// Tidy any errant double dashed lists.
-			htmlFragment = Regex.Replace(htmlFragment, @"-\s-{1,}", "-");
-
-			// Normalize whitespace
-			htmlFragment = Regex.Replace(htmlFragment, @"\s{2,}", " ");
-			*/
 		}
 
 		private static void FinalPass() {
@@ -148,38 +124,19 @@ namespace Acervuline {
 
 			htmlFragment = htmlFragment.Trim();
 
-			// legacy code
-			
-			/*
-			htmlFragment = Regex.Replace(htmlFragment, @"(?<!\w)(<\/\w+>)(?!$)", "\n$1\n", RegexOptions.Multiline);
-
-			htmlFragment = Regex.Replace(htmlFragment, "<h3>", "\n<h3>", RegexOptions.Multiline);
-
-			// Then wrap text that isn't contained within a tag in p tags
-			htmlFragment = Regex.Replace(htmlFragment, @"^(?!<)(.*?)$", "<p>$1</p>", RegexOptions.Multiline);
-
-			htmlFragment = Regex.Replace(htmlFragment, @"\n?<p>\s?<\/p>", "");
-			*/
-
 		}
 
 		private static void AssessmentPass() {
 
-			htmlFragment = Regex.Replace(htmlFragment, @"<\/h3>\s?(.*?)\s?(?=$|<h3>)", "</h3>\n$1\n", RegexOptions.Multiline);
-			htmlFragment = Regex.Replace(htmlFragment, @"<h3>(.*?):<\/h3>", "<h3>$1</h3>", RegexOptions.Multiline);
+			Dictionary<string, string> searchList = new Dictionary<string, string>() {
+				{ @"<\/h3>\s?(.*?)\s?(?=$|<h3>)", "</h3>\n$1\n" },
+				{ @"<h3>(.*?):<\/h3>", "<h3>$1</h3>" }
+			};
 
-			//htmlFragment = Regex.Replace(htmlFragment, "(</h3>\n)^(.*?)$", "$1<p>$2</p>", RegexOptions.Multiline);
-
-			/*
-			MatchCollection taglessText = Regex.Matches(htmlFragment, @"<\/h3>\s?(.*?)\s?(?=$|<h3>)", RegexOptions.Multiline);
-
-			foreach(Match textBlock in taglessText) {
-
-				string textItem = textBlock.Groups[1].ToString();
-
-				htmlFragment = htmlFragment.Replace(textItem, "<p>" + textItem + "</p>");
+			foreach(var entry in searchList) {
+				htmlFragment = Regex.Replace(htmlFragment, entry.Key, entry.Value, RegexOptions.Multiline);
 			}
-			*/
+
 		}
 
 		/// <summary>
@@ -226,6 +183,7 @@ namespace Acervuline {
 
 			}
 			*/
+
 		} // End NormalizeLists
 
 		/// <summary>

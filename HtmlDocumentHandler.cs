@@ -14,15 +14,16 @@ namespace Acervuline {
 		static HtmlDocument workingFile;
 		static bool unitHasSemesters;
 
+
 		/// <summary>
 		///		Begins parsing the current given HtmlDocument
 		/// </summary>
 		/// <param name="currentFile"></param>
-		public static void ParseCurrentUnitFile(HtmlDocument currentFile) {
+		public static Dictionary<string, dynamic> ParseCurrentUnitFile(HtmlDocument currentFile) {
 
 			workingFile = currentFile;
 			unitData = new Dictionary<string, dynamic>();
-
+			unitData.Add("semesters", new Dictionary<string, dynamic>());
 
 			ParseHeaderData();
 			GetUnitSynopsis();
@@ -34,9 +35,20 @@ namespace Acervuline {
 
 					Dictionary<string,dynamic> parsedOutline = UnitOverviewHandler.UnitOverviewInit(overviewFile);
 
+					Regex overviewTitleRegex = new Regex(@"(?:(?:SEM-(1|2))|([0-9][a-zA-Z]+[0-9])|(SUM))-(\d+)");
+					MatchCollection overviewTitle = overviewTitleRegex.Matches(overviewFile);
+
+					unitData["semesters"].Add(overviewTitle[0].Groups[0].ToString(), parsedOutline);
+
 				}
 
+
 			}
+
+			return unitData;
+
+			//disciplineData.Add(unitData["unitCode"],unitData);
+
 			//Console.ReadLine();
 
 		} // End ParseCurrentUnitFile
@@ -71,11 +83,16 @@ namespace Acervuline {
 
 		private static void GetUnitSynopsis() {
 
-			HtmlNodeCollection sectionContent = workingFile.DocumentNode.SelectNodes("//div[@class='content']//h3/following-sibling::div[1]");
+			try {
+				HtmlNodeCollection sectionContent = workingFile.DocumentNode.SelectNodes("//div[@class='content']//h3/following-sibling::div[1]");
 
-			string unitSynopsis = sectionContent[0].InnerText;
+				string unitSynopsis = sectionContent[0].InnerText;
 
-			unitData.Add("synopsis", unitSynopsis);
+				unitData.Add("synopsis", unitSynopsis);
+			}
+			catch {
+				unitData.Add("synopsis", "This unit has no synopsis");
+			}
 
 		}
 
@@ -154,6 +171,7 @@ namespace Acervuline {
 				case "Prerequisite(s)":
 					category = "prereqs";
 					break;
+				case "Antirequisite(s):":
 				case "Antirequisite(s)":
 					category = "antireqs";
 					break;
@@ -161,6 +179,7 @@ namespace Acervuline {
 				case "Equivalent(s)":
 					category = "equivs";
 					break;
+				case "Assumed knowledge:":
 				case "Assumed knowledge":
 					category = "assumed";
 					break;
@@ -212,6 +231,9 @@ namespace Acervuline {
 					break;
 				case "Email:":
 					category = "email";
+					break;
+				case "Other requisite(s):":
+					category = "otherreqs";
 					break;
 			}
 

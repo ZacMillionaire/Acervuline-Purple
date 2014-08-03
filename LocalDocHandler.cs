@@ -1,4 +1,5 @@
 ﻿using HtmlAgilityPack;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -16,6 +17,7 @@ namespace Acervuline {
 
 			foreach(string unitFolder in dirlist) {
 				ReadFromUnitFolder(unitFolder);
+				//break;
 			}
 
 
@@ -28,10 +30,18 @@ namespace Acervuline {
 		/// <param name="unitDir"></param>
 		private static void ReadFromUnitFolder(string unitDir) {
 
+			if(File.Exists(unitDir + "\\" + "re-parsed.txt")) {
+				//File.Delete(Program.CurrentFolderPath + "re-parsed.txt");
+				Console.WriteLine("{0} Already reparsed. Skipping.", unitDir);
+				//return;
+			}
+
+			Dictionary<string, dynamic> disciplineData = new Dictionary<string, dynamic>();
+
 			Console.WriteLine("Reading All HTML files within {0}", unitDir);
 
 			//IEnumerable<string> filelist = Directory.EnumerateFiles(unitDir, "*.html");
-			Regex reg = new Regex(@"[A-Z]{3,}[0-9]{3,}\.html");
+			Regex reg = new Regex(@"([A-Z]{3,}[0-9]{3,})\.html");
 			IEnumerable<string> filelist = Directory.GetFiles(unitDir, "*.html").Where(Path => reg.IsMatch(Path));
 
 			foreach(string fileName in filelist) {
@@ -42,9 +52,19 @@ namespace Acervuline {
 
 				HtmlDocument currentFile = LoadFileForReading(fileName);
 
-				HtmlDocumentHandler.ParseCurrentUnitFile(currentFile);
+				string unitCode = reg.Match(fileName).Groups[1].ToString();
+
+				disciplineData.Add(unitCode, HtmlDocumentHandler.ParseCurrentUnitFile(currentFile));
 
 			}
+
+			string pressXtoJSON = JsonConvert.SerializeObject(disciplineData);
+
+			if(File.Exists(Program.CurrentFolderPath + "re-parsed.txt")) {
+				File.Delete(Program.CurrentFolderPath + "re-parsed.txt");
+			}
+
+			File.AppendAllText(Program.CurrentFolderPath + "re-parsed.txt", pressXtoJSON);
 
 			Console.WriteLine();
 
