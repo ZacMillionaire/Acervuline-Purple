@@ -1,4 +1,5 @@
-﻿using HtmlAgilityPack;
+﻿using System.Globalization;
+using HtmlAgilityPack;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,10 +36,19 @@ namespace Acervuline {
 
 					Dictionary<string,dynamic> parsedOutline = UnitOverviewHandler.UnitOverviewInit(overviewFile);
 
-					Regex overviewTitleRegex = new Regex(@"(?:(?:SEM-(1|2))|([0-9][a-zA-Z]+[0-9])|(SUM))-(\d+)");
-					MatchCollection overviewTitle = overviewTitleRegex.Matches(overviewFile);
+					try
+					{
+						Regex overviewTitleRegex = new Regex(@"(?:(?:SEM-(1|2))|([0-9][a-zA-Z]+[0-9])|(SUM)-(1|2))-(\d+)");
+						MatchCollection overviewTitle = overviewTitleRegex.Matches(overviewFile);
+						unitData["semesters"].Add(overviewTitle[0].Groups[0].ToString(), parsedOutline);
+					}
+					catch (Exception)
+					{
+						Regex overviewTitleRegex = new Regex(@"(?:(?:SEM-(1|2))|([0-9][a-zA-Z]+[0-9])|(SUM))-(\d+)");
+						MatchCollection overviewTitle = overviewTitleRegex.Matches(overviewFile);
+						unitData["semesters"].Add(overviewTitle[0].Groups[0].ToString(), parsedOutline);
+					}
 
-					unitData["semesters"].Add(overviewTitle[0].Groups[0].ToString(), parsedOutline);
 
 				}
 
@@ -57,6 +67,12 @@ namespace Acervuline {
 
 			bool summerOffer = false;
 			summerData = new Dictionary<string, dynamic>();
+
+			string title = workingFile.DocumentNode.SelectSingleNode("//div[@id='unit']//h2").InnerText;
+			Regex unitTitleRegex = new Regex(@"[A-Z]{3,}[0-9]{3,}\s+([a-zA-Z\s\S]+)\n");
+			MatchCollection titleMatches = unitTitleRegex.Matches(title);
+			string whatever = titleMatches[0].Groups[1].ToString();
+			unitData.Add("title",whatever);
 
 			foreach(HtmlNode tableData in workingFile.DocumentNode.SelectNodes("//table/tr")) {
 
@@ -273,7 +289,12 @@ namespace Acervuline {
 
 				return ParseAvailabilities(bodyContent);
 
-			}
+			} else if(category == "CSP" || category == "DOM" || category == "INT")
+			{
+				bodyContent = int.Parse(bodyContent, NumberStyles.Currency).ToString();
+			} /*else if(category == "feeRate") {
+				Regex extractRegex = new Regex(@"");
+			}*/
 
 			return bodyContent.Trim();
 

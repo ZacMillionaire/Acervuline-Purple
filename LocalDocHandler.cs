@@ -11,6 +11,8 @@ using System.Threading.Tasks;
 namespace Acervuline {
 	class LocalDocHandler {
 
+		private static ParseToDB dbSystem = new ParseToDB();
+
 		public LocalDocHandler(string directory) {
 
 			IEnumerable<string> dirlist = Directory.EnumerateDirectories(directory);
@@ -54,18 +56,22 @@ namespace Acervuline {
 
 				string unitCode = reg.Match(fileName).Groups[1].ToString();
 
-				disciplineData.Add(unitCode, HtmlDocumentHandler.ParseCurrentUnitFile(currentFile));
+				Dictionary<string, dynamic> parsedData = HtmlDocumentHandler.ParseCurrentUnitFile(currentFile);
+				dbSystem.Insert(parsedData);
+				DocumentParser.ParseDocument(currentFile);
+
+				//refact: disciplineData.Add(unitCode, parsedData);
 
 			}
 
-			string pressXtoJSON = JsonConvert.SerializeObject(disciplineData);
+			/*string pressXtoJSON = JsonConvert.SerializeObject(disciplineData);
 
 			if(File.Exists(Program.CurrentFolderPath + "re-parsed.txt")) {
 				File.Delete(Program.CurrentFolderPath + "re-parsed.txt");
 			}
 
 			File.AppendAllText(Program.CurrentFolderPath + "re-parsed.txt", pressXtoJSON);
-
+			*/
 			Console.WriteLine();
 
 		} // End ReadFromUnitFolder

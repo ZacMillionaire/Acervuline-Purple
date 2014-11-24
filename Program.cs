@@ -27,7 +27,7 @@ namespace Acervuline {
 
 				PrintMenuBanner(
 					new List<string>(){
-						"Acervuline v24.07.2014",
+						"Acervuline v26.10.2014",
 						"",
 						"Select an option"
 					},
@@ -41,7 +41,8 @@ namespace Acervuline {
 
 					switch(choice) {
 						case 1:
-							loadStreamFromWeb("blank");
+							UnitCrawler.CrawlFromBase();
+							//loadStreamFromWeb("blank");
 							break;
 						case 2:
 							loadStreamFromLocal(RootFolder);

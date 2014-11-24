@@ -1,4 +1,5 @@
-﻿using HtmlAgilityPack;
+﻿using System.Diagnostics;
+using HtmlAgilityPack;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -35,11 +36,13 @@ namespace Acervuline {
 			GetUnitOutlines();
 
 			outlineDict = overviewDict;
-
+			/*
 			tagWeights = TagBuilder.TFIFD();
 
 			tagWeights = tagWeights.OrderBy(x => x.Value).Reverse().ToDictionary(x => x.Key, x => x.Value);
 			string pressXtoJSON = JsonConvert.SerializeObject(tagWeights);
+			 * */
+			
 
 		}
 
@@ -59,11 +62,13 @@ namespace Acervuline {
 				HtmlNodeCollection sectionContent = headerNode.SelectNodes("./following-sibling::*");
 
 				string sectionOutline = FormatSectionData(sectionTitle, sectionContent);
-				wordFrequency = TagBuilder.BuildTagDictionary(sectionOutline);
+				//wordFrequency = TagBuilder.BuildTagDictionary(sectionOutline);
 				
 				overviewDict.Add(sectionTitle, sectionOutline);
 
 			}
+
+			Debug.WriteLine("");
 
 		} // End GetUnitOutlines
 
@@ -72,7 +77,7 @@ namespace Acervuline {
 
 			Dictionary<string, dynamic> headerDict = new Dictionary<string, dynamic>();
 
-			foreach(HtmlNode tableData in workingFile.DocumentNode.SelectNodes("//table/tr")) {
+			foreach(HtmlNode tableData in workingFile.DocumentNode.SelectNodes("//table//tr")) {
 
 				string rowHeader;
 				dynamic rowBody;
